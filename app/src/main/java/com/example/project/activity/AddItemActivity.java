@@ -106,9 +106,15 @@ public class AddItemActivity extends AppCompatActivity {
         i.setCategoryid(categoryId);
 
         long newId = itemDao.create(i);
-        if (newId > 0)
+        if (newId > 0){
             Toast.makeText(this, "Item added successfully!", Toast.LENGTH_SHORT).show();
-        else
+            finish();
+        }
+
+        else{
             Toast.makeText(this, "Failed to add item.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
     }
 }

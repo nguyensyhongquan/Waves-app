@@ -17,7 +17,7 @@ import com.example.project.models.item;
 
 import java.util.List;
 
-public class ViewItemActivity extends AppCompatActivity {
+public class AdminViewItemActivity extends AppCompatActivity {
 
     private RecyclerView rvItemList;
     private Button btnAddItem, btnBack;

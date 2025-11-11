@@ -47,25 +47,23 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         // Sự kiện cho các nút
         btnViewMenu.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CategoryActivity.class);
+            Intent intent = new Intent(this, AdminCategoryActivity.class);
             startActivity(intent);
         });
 
-        btnViewMenu.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ViewItemActivity.class);
+        btnAllItemMenu.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminViewItemActivity.class);
             startActivity(intent);
         });
 
         btnSold.setOnClickListener(v -> {
-            // Intent intent = new Intent(this, SoldActivity.class);
-            // startActivity(intent);
-            Toast.makeText(this, "Sold", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, HistoryActivity.class);
+            startActivity(intent);
         });
 
         btnUser.setOnClickListener(v -> {
-            // Intent intent = new Intent(this, UserListActivity.class);
-            // startActivity(intent);
-            Toast.makeText(this, "User", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, AdminUserActivity.class);
+            startActivity(intent);
         });
 
         btnProfile.setOnClickListener(v -> {

@@ -56,18 +56,31 @@ public class LoginActivity extends AppCompatActivity {
         // Sử dụng UserDao để kiểm tra tài khoản
         user account = userDao.authRequest(emailOrPhone, password);
 
-        if (account != null) {
-            // Login thành công
-            Toast.makeText(this, "Xin chào " + account.getName() + " (" + account.getRole() + ")", Toast.LENGTH_SHORT).show();
+        if (account == null) {
+            // Login thất bại
+            Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            // Chuyển sang HomeActivity
+        // Kiểm tra role null hoặc rỗng
+        String role = account.getRole();
+        if (role == null || role.isEmpty()) {
+            Toast.makeText(this, "Tài khoản bị chặn!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Login thành công
+        Toast.makeText(this, "Xin chào " + account.getName() + " (" + role + ")", Toast.LENGTH_SHORT).show();
+        if (role.equals("Admin")) {
+            Intent intent = new Intent(LoginActivity.this, AdminHomeActivity.class);
+            intent.putExtra("username", account.getName());
+            startActivity(intent);
+            finish();
+        } else if (role.equals("User")) {
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             intent.putExtra("username", account.getName());
             startActivity(intent);
             finish();
-        } else {
-            // Login thất bại
-            Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
         }
     }
 }

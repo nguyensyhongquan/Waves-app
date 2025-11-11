@@ -1,4 +1,5 @@
 package com.example.project.dao;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.project.databasehelper.DatabaseHelper;
 import com.example.project.models.historyitem;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,9 +17,38 @@ import java.util.Locale;
 
 public class HistoryDao {
     private DatabaseHelper dbHelper;
+    // match the format you used when inserting
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     public HistoryDao(Context context) {
         dbHelper = new DatabaseHelper(context);
+    }
+
+    // Helper: parse date string safely with fallback
+    private Date parseDateSafe(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        if (s.isEmpty()) return null;
+
+        // try format yyyy-MM-dd
+        try {
+            return sdf.parse(s);
+        } catch (ParseException ignored) {}
+
+        // fallback: try parse as long (epoch millis stored as text)
+        try {
+            long epoch = Long.parseLong(s);
+            return new Date(epoch);
+        } catch (NumberFormatException ignored) {}
+
+        // fallback: try common datetime pattern "yyyy-MM-dd HH:mm:ss"
+        try {
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return sdf2.parse(s);
+        } catch (ParseException ignored) {}
+
+        // couldn't parse
+        return null;
     }
 
     // Lấy toàn bộ lịch sử
@@ -37,7 +68,15 @@ public class HistoryDao {
                     h.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
                     h.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
                     h.setImage(cursor.getString(cursor.getColumnIndexOrThrow("image")));
-                    h.setOrderdate(new Date(cursor.getString(cursor.getColumnIndexOrThrow("orderdate"))));
+
+                    String dateStr = null;
+                    int idxDate = cursor.getColumnIndex("orderdate");
+                    if (idxDate != -1) {
+                        dateStr = cursor.getString(idxDate);
+                    }
+                    Date parsed = parseDateSafe(dateStr);
+                    h.setOrderdate(parsed);
+
                     list.add(h);
                 } while (cursor.moveToNext());
             }
@@ -60,8 +99,8 @@ public class HistoryDao {
             values.put("quantity", h.getQuantity());
             values.put("image", h.getImage());
 
-            // Lấy thời gian hiện tại định dạng yyyy-MM-dd
-            String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            // Lưu theo format yyyy-MM-dd để tương thích code cũ
+            String currentDate = sdf.format(new Date());
             values.put("orderdate", currentDate);
 
             newId = db.insert("historyitem", null, values);
@@ -88,7 +127,15 @@ public class HistoryDao {
                     h.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
                     h.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
                     h.setImage(cursor.getString(cursor.getColumnIndexOrThrow("image")));
-                    h.setOrderdate(new Date(cursor.getString(cursor.getColumnIndexOrThrow("orderdate"))));
+
+                    String dateStr = null;
+                    int idxDate = cursor.getColumnIndex("orderdate");
+                    if (idxDate != -1) {
+                        dateStr = cursor.getString(idxDate);
+                    }
+                    Date parsed = parseDateSafe(dateStr);
+                    h.setOrderdate(parsed);
+
                     list.add(h);
                 } while (cursor.moveToNext());
             }
@@ -107,13 +154,17 @@ public class HistoryDao {
         Cursor cursor = null;
 
         try {
-            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            String today = sdf.format(new Date()); // yyyy-MM-dd
             cursor = db.rawQuery(
                     "SELECT SUM(price * quantity) AS total FROM historyitem WHERE orderdate = ?",
                     new String[]{today}
             );
             if (cursor.moveToFirst()) {
-                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+                // nếu total null, getDouble sẽ trả 0.0
+                int idx = cursor.getColumnIndex("total");
+                if (idx != -1 && !cursor.isNull(idx)) {
+                    total = cursor.getDouble(idx);
+                }
             }
         } finally {
             if (cursor != null) cursor.close();
@@ -135,7 +186,10 @@ public class HistoryDao {
                     new String[]{month}
             );
             if (cursor.moveToFirst()) {
-                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+                int idx = cursor.getColumnIndex("total");
+                if (idx != -1 && !cursor.isNull(idx)) {
+                    total = cursor.getDouble(idx);
+                }
             }
         } finally {
             if (cursor != null) cursor.close();
@@ -157,7 +211,10 @@ public class HistoryDao {
                     new String[]{year}
             );
             if (cursor.moveToFirst()) {
-                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+                int idx = cursor.getColumnIndex("total");
+                if (idx != -1 && !cursor.isNull(idx)) {
+                    total = cursor.getDouble(idx);
+                }
             }
         } finally {
             if (cursor != null) cursor.close();

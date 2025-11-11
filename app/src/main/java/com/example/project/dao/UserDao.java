@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.project.databasehelper.DatabaseHelper;
 import com.example.project.models.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserDao {
     private DatabaseHelper dbHelper;
 
@@ -98,4 +101,39 @@ public class UserDao {
         db.close();
         return rows; // Trả về số dòng được cập nhật
     }
+
+    // Lấy tất cả user trừ Admin
+    public List<user> getAllOtherThanAdmin() {
+        List<user> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Chọn tất cả trừ role = "Admin"
+            cursor = db.rawQuery(
+                    "SELECT * FROM user WHERE role IS NULL OR role != ?",
+                    new String[]{"Admin"}
+            );
+
+            if (cursor.moveToFirst()) {
+                do {
+                    user u = new user();
+                    u.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("userid")));
+                    u.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+                    u.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                    u.setPassword(cursor.getString(cursor.getColumnIndexOrThrow("password")));
+                    u.setAddress(cursor.getString(cursor.getColumnIndexOrThrow("address")));
+                    u.setPhone(cursor.getString(cursor.getColumnIndexOrThrow("phone")));
+                    u.setRole(cursor.getString(cursor.getColumnIndexOrThrow("role")));
+                    list.add(u);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return list;
+    }
+
 }
