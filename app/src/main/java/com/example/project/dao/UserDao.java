@@ -15,19 +15,19 @@ public class UserDao {
         dbHelper = new DatabaseHelper(context);
     }
 
-    // 🔹 1. AuthRequest: Kiểm tra login (email + password)
-    public user authRequest(String email, String password) {
+    // 🔹 Kiểm tra login: có thể dùng email hoặc phone + password
+    public user authRequest(String emailOrPhone, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         user account = null;
 
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM account WHERE email = ? AND password = ?",
-                new String[]{email, password}
+                "SELECT * FROM user WHERE (email = ? OR phone = ?) AND password = ?",
+                new String[]{emailOrPhone, emailOrPhone, password}
         );
 
         if (cursor.moveToFirst()) {
             account = new user();
-            account.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("accountid")));
+            account.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("userid")));
             account.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
             account.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
             account.setPassword(cursor.getString(cursor.getColumnIndexOrThrow("password")));
@@ -41,19 +41,19 @@ public class UserDao {
         return account; // Trả về null nếu không tìm thấy
     }
 
-    // 🔹 2. GetAccountById
+    // 🔹 Lấy account theo id
     public user getAccountById(int id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         user account = null;
 
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM account WHERE accountid = ?",
+                "SELECT * FROM user WHERE userid = ?",
                 new String[]{String.valueOf(id)}
         );
 
         if (cursor.moveToFirst()) {
             account = new user();
-            account.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("accountid")));
+            account.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("userid")));
             account.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
             account.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
             account.setPassword(cursor.getString(cursor.getColumnIndexOrThrow("password")));
@@ -67,7 +67,7 @@ public class UserDao {
         return account;
     }
 
-    // 🔹 3. CreateAccount
+    // 🔹 Tạo account mới
     public long createAccount(user account) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -78,12 +78,12 @@ public class UserDao {
         values.put("phone", account.getPhone());
         values.put("role", account.getRole());
 
-        long id = db.insert("account", null, values);
+        long id = db.insert("user", null, values);
         db.close();
         return id; // Trả về id của account mới
     }
 
-    // 🔹 4. UpdateAccount
+    // 🔹 Cập nhật account
     public int updateAccount(user account) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -99,4 +99,3 @@ public class UserDao {
         return rows; // Trả về số dòng được cập nhật
     }
 }
-

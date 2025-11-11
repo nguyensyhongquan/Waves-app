@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+/*import com.bumptech.glide.Glide;*/
 import com.example.project.R;
 import com.example.project.dao.CategoryDao;
 import com.example.project.models.category;
@@ -44,8 +44,8 @@ public class CategoryAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null)
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_category, parent, false);
+        /*if (convertView == null)
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_category, parent, false);*/
 
         ImageView img = convertView.findViewById(R.id.imgCategory);
         TextView tvName = convertView.findViewById(R.id.tvCategoryName);
@@ -55,7 +55,7 @@ public class CategoryAdapter extends BaseAdapter {
         category c = list.get(position);
         tvName.setText(c.getName());
         tvDesc.setText(c.getDescription());
-        Glide.with(context).load(c.getImage()).placeholder(R.drawable.ic_launcher_background).into(img);
+       /* Glide.with(context).load(c.getImage()).placeholder(R.drawable.ic_launcher_background).into(img);*/
 
         btnDelete.setOnClickListener(v -> {
             dao.delete(c.getId());
