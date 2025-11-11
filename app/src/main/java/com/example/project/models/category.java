@@ -6,11 +6,16 @@ public class category {
 
     private int id;
     private String name;
-    private List<item> itemlist;
+    private String image;
+    private String description;
 
-    public category(String name, List<item> itemlist) {
+    public category() {
+    }
+
+    public category(String name, String image, String description) {
         this.name = name;
-        this.itemlist = itemlist;
+        this.image = image;
+        this.description = description;
     }
 
     public int getId() {
@@ -29,11 +34,19 @@ public class category {
         this.name = name;
     }
 
-    public List<item> getItemlist() {
-        return itemlist;
+    public String getImage() {
+        return image;
     }
 
-    public void setItemlist(List<item> itemlist) {
-        this.itemlist = itemlist;
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
