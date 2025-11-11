@@ -14,7 +14,7 @@ import com.example.project.models.category;
 
 import java.util.List;
 
-public class CategoryActivity extends AppCompatActivity {
+public class AdminCategoryActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
     private Button btnAddCategory;

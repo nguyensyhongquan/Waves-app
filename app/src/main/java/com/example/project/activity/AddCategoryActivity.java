@@ -2,18 +2,20 @@ package com.example.project.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Toast;
-
+import android.provider.MediaStore;
+import android.widget.*;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.project.R;
 import com.example.project.dao.CategoryDao;
 import com.example.project.models.category;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class AddCategoryActivity extends AppCompatActivity {
 
@@ -21,7 +23,7 @@ public class AddCategoryActivity extends AppCompatActivity {
     private EditText etName, etDesc;
     private ImageView imgPreview;
     private Button btnChooseImage, btnSave;
-    private Uri imageUri;
+    private String encodedImage = null;
     private CategoryDao dao;
 
     @Override
@@ -36,37 +38,51 @@ public class AddCategoryActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         dao = new CategoryDao(this);
 
-        btnChooseImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, PICK_IMAGE);
-        });
+        btnChooseImage.setOnClickListener(v -> openImageChooser());
+        btnSave.setOnClickListener(v -> saveCategory());
+    }
 
-        btnSave.setOnClickListener(v -> {
-            String name = etName.getText().toString();
-            String desc = etDesc.getText().toString();
-            if (name.isEmpty() || imageUri == null) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            category c = new category();
-            c.setName(name);
-            c.setDescription(desc);
-            c.setImage(imageUri.toString());
-            dao.create(c);
-
-            Toast.makeText(this, "Added successfully", Toast.LENGTH_SHORT).show();
-            finish();
-        });
+    private void openImageChooser() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
-            imageUri = data.getData();
-            imgPreview.setImageURI(imageUri);
+            Uri imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                imgPreview.setImageBitmap(bitmap);
+
+                // nén ảnh thành PNG rồi mã hóa Base64
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] imageBytes = baos.toByteArray();
+                encodedImage = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void saveCategory() {
+        String name = etName.getText().toString().trim();
+        String desc = etDesc.getText().toString().trim();
+
+        if (name.isEmpty() || encodedImage == null) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        category c = new category();
+        c.setName(name);
+        c.setDescription(desc);
+        c.setImage(encodedImage); // lưu Base64 thay vì URI
+
+        dao.create(c);
+        Toast.makeText(this, "Added successfully", Toast.LENGTH_SHORT).show();
+        finish();
     }
 }

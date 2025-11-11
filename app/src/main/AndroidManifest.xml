@@ -30,6 +30,27 @@
         <activity
             android:name=".activity.HomeActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.AdminHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminViewItemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AddItemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AddCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.HistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminUserActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
