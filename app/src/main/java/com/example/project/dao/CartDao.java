@@ -185,6 +185,12 @@ public class CartDao {
         }
         return newId;
     }
+    public void clearCart() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("cartitem", null, null);
+        db.close();
+    }
+
 
     // Cập nhật lại cart item (ví dụ khi thay đổi số lượng)
     public int updateCartItem(cartitem c) {
