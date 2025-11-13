@@ -62,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
         newUser.setEmail(emailPhone);
         newUser.setPhone(emailPhone);
         newUser.setPassword(password);
-        newUser.setRole("user"); // role mặc định
+        newUser.setRole("User"); // role mặc định
 
         long id = userDao.createAccount(newUser);
         if (id > 0) {
