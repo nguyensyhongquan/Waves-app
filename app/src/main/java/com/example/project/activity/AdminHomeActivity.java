@@ -67,13 +67,26 @@ public class AdminHomeActivity extends AppCompatActivity {
         });
 
         btnProfile.setOnClickListener(v -> {
-            // Intent intent = new Intent(this, AdminProfileActivity.class);
-            // startActivity(intent);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AdminHomeActivity.this, ProfileActivity.class);
+            startActivity(intent);
         });
 
         btnLogout.setOnClickListener(v -> {
-            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+            // 🔹 Xóa userId trong SharedPreferences
+            getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                    .edit()
+                    .remove("userId")
+                    .apply();
+
+            // 🔹 Thông báo đăng xuất
+            Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+
+            // 🔹 Chuyển về trang đăng nhập
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+            // 🔹 Đóng activity hiện tại
             finish();
         });
     }
