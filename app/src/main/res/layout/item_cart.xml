@@ -71,12 +71,19 @@
             android:textColor="#000" />
 
         <ImageButton
-            android:id="@+id/btnPlus"
+            android:id="@+id/btnAdd"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_add"
             android:background="@android:color/transparent"
             app:tint="#D32F2F" />
     </LinearLayout>
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_delete"
+        android:background="@null"
+        app:tint="#D32F2F" />
 
 </LinearLayout>

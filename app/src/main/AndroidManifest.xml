@@ -51,6 +51,10 @@
         <activity
             android:name=".activity.AdminUserActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.CartActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

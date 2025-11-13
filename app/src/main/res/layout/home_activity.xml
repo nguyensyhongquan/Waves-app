@@ -8,7 +8,6 @@
     android:background="#FDFDFD"
     tools:context=".activity.HomeActivity">
 
-    <!-- Nội dung cuộn -->
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="match_parent"
@@ -44,7 +43,8 @@
                 android:background="@drawable/edittext_bg"
                 android:paddingStart="12dp"
                 android:layout_marginTop="12dp"
-                android:inputType="text" />
+                android:inputType="text"
+                android:imeOptions="actionSearch" />
 
             <!-- Banner -->
             <ImageView
@@ -54,18 +54,37 @@
                 android:layout_marginTop="12dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/banner" />
-            <!-- Popular title -->
+
+            <!-- Category title -->
             <TextView
-                android:id="@+id/tvPopular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Popular"
+                android:text="Categories"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#D32F2F"
                 android:layout_marginTop="12dp" />
 
-            <!-- RecyclerView danh sách món ăn -->
+            <!-- RecyclerView category ngang -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCategory"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:scrollbars="horizontal"/>
+
+            <!-- Popular foods title -->
+            <TextView
+                android:id="@+id/tvFoodTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Popular Foods"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"
+                android:layout_marginTop="12dp" />
+
+            <!-- RecyclerView món ăn -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerFoodList"
                 android:layout_width="match_parent"
@@ -73,12 +92,11 @@
                 android:layout_marginTop="8dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
-                android:scrollbars="none" />
-
+                android:scrollbars="none"/>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Thanh điều hướng dưới cùng -->
+    <!-- Bottom navigation -->
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_alignParentBottom="true"
@@ -172,7 +190,6 @@
             android:orientation="vertical"
             android:gravity="center"
             android:background="@drawable/ic_infomation"
-            android:layout_marginLeft="8dp">
-        </LinearLayout>
+            android:layout_marginLeft="8dp"/>
     </LinearLayout>
 </RelativeLayout>

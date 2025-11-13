@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.project.databasehelper.DatabaseHelper;
 import com.example.project.models.item;
+import com.example.project.models.category;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,4 +149,32 @@ public class ItemDao {
 
         return list;
     }
+    public List<item> getByCategory(int categoryId) {
+        List<item> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(
+                    "SELECT id, name, description, price, image FROM item WHERE categoryid = ?",
+                    new String[]{String.valueOf(categoryId)}
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    item i = new item();
+                    i.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                    i.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+                    i.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
+                    i.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
+                    i.setImage(cursor.getString(cursor.getColumnIndexOrThrow("image")));
+                    list.add(i);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+        return list;
+    }
+
+
 }

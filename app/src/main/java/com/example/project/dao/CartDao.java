@@ -122,4 +122,86 @@ public class CartDao {
         }
         return rows;
     }
+    // Tính tổng tiền giỏ hàng
+    public double getTotalPrice() {
+        double total = 0;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT SUM(price * quantity) AS total FROM cartitem",
+                    null
+            );
+            if (cursor.moveToFirst()) {
+                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return total;
+    }
+    // Lấy cart item theo itemId
+    public cartitem getCartItemByItemId(int itemId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        cartitem c = null;
+
+        try {
+            cursor = db.rawQuery("SELECT * FROM cartitem WHERE id = ?", new String[]{String.valueOf(itemId)});
+            if (cursor.moveToFirst()) {
+                c = new cartitem();
+                c.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                c.setUserid(cursor.getInt(cursor.getColumnIndexOrThrow("userid")));
+                c.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+                c.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
+                c.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
+                c.setImage(cursor.getString(cursor.getColumnIndexOrThrow("image")));
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return c;
+    }
+
+    // Thêm 1 cart item mới
+    public long insertCartItem(cartitem c) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long newId;
+        try {
+            ContentValues values = new ContentValues();
+            values.put("userid", c.getUserid());
+            values.put("name", c.getName());
+            values.put("price", c.getPrice());
+            values.put("quantity", c.getQuantity());
+            values.put("image", c.getImage());
+            newId = db.insert("cartitem", null, values);
+        } finally {
+            db.close();
+        }
+        return newId;
+    }
+
+    // Cập nhật lại cart item (ví dụ khi thay đổi số lượng)
+    public int updateCartItem(cartitem c) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int rows;
+        try {
+            ContentValues values = new ContentValues();
+            values.put("userid", c.getUserid());
+            values.put("name", c.getName());
+            values.put("price", c.getPrice());
+            values.put("quantity", c.getQuantity());
+            values.put("image", c.getImage());
+            rows = db.update("cartitem", values, "id = ?", new String[]{String.valueOf(c.getId())});
+        } finally {
+            db.close();
+        }
+        return rows;
+    }
+
 }

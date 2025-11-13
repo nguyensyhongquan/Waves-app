@@ -6,27 +6,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.project.R;
+import com.example.project.dao.CartDao;
+import com.example.project.models.cartitem;
 import com.example.project.models.item;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<item> itemList;
+    private final CartDao cartDao;
 
     public FoodAdapter(Context context, List<item> itemList) {
         this.context = context;
         this.itemList = itemList;
+        this.cartDao = new CartDao(context);
     }
 
     public void updateList(List<item> newList) {
-        itemList = newList;
+        this.itemList = newList;
         notifyDataSetChanged();
     }
 
@@ -40,11 +47,21 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         item currentItem = itemList.get(position);
-        holder.tvName.setText(currentItem.getName());
-        holder.tvPrice.setText("$" + currentItem.getPrice());
+        if (currentItem == null) return;
 
-        // Load ảnh từ drawable theo tên
-        if (currentItem.getImage() != null && !currentItem.getImage().isEmpty()) {
+        holder.tvName.setText(currentItem.getName());
+        holder.tvPrice.setText(String.format("$%.2f", currentItem.getPrice()));
+
+        // Ưu tiên load ảnh online qua URL (nếu có)
+        if (currentItem.getImage() != null && currentItem.getImage().startsWith("http")) {
+            Picasso.get()
+                    .load(currentItem.getImage())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .into(holder.imgFood);
+        }
+        // Nếu chỉ có tên ảnh trong drawable
+        else if (currentItem.getImage() != null && !currentItem.getImage().isEmpty()) {
             int resId = context.getResources().getIdentifier(
                     currentItem.getImage(), "drawable", context.getPackageName());
             if (resId != 0) {
@@ -52,25 +69,49 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             } else {
                 holder.imgFood.setImageResource(R.drawable.placeholder);
             }
-        } else {
+        }
+        // Nếu không có ảnh
+        else {
             holder.imgFood.setImageResource(R.drawable.placeholder);
         }
+
+        // Sự kiện thêm vào giỏ hàng
+        holder.btnAddToCart.setOnClickListener(v -> {
+            cartitem existingItem = cartDao.getCartItemByItemId(currentItem.getId());
+            if (existingItem != null) {
+                existingItem.setQuantity(existingItem.getQuantity() + 1);
+                cartDao.updateCartItem(existingItem);
+                Toast.makeText(context, R.string.cart_updated, Toast.LENGTH_SHORT).show();
+            } else {
+                cartitem newItem = new cartitem(
+                        currentItem.getId(),
+                        currentItem.getName(),
+                        currentItem.getPrice(),
+                        1,
+                        currentItem.getImage()
+                );
+                cartDao.insertCartItem(newItem);
+                Toast.makeText(context, R.string.added_to_cart, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return itemList != null ? itemList.size() : 0;
     }
 
     public static class FoodViewHolder extends RecyclerView.ViewHolder {
         ImageView imgFood;
         TextView tvName, tvPrice;
+        Button btnAddToCart;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
             imgFood = itemView.findViewById(R.id.imgFood);
             tvName = itemView.findViewById(R.id.tvName);
             tvPrice = itemView.findViewById(R.id.tvPrice);
+            btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
         }
     }
 }

@@ -2,18 +2,23 @@ package com.example.project.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.project.R;
+import com.example.project.adapter.CategoryHomeAdapter;
 import com.example.project.adapter.FoodAdapter;
+import com.example.project.dao.CategoryDao;
 import com.example.project.dao.ItemDao;
+import com.example.project.models.category;
 import com.example.project.models.item;
 
 import java.util.List;
@@ -21,9 +26,14 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity {
 
     private RecyclerView recyclerFoodList;
-    private FoodAdapter adapter;
+    private FoodAdapter foodAdapter;
     private List<item> itemList;
     private ItemDao itemDao;
+
+    private RecyclerView recyclerCategory;
+    private CategoryHomeAdapter categoryAdapter;
+    private List<category> categoryList;
+    private CategoryDao categoryDao;
 
     private EditText etSearch;
     private LinearLayout navHome, navCart, navOrder, navProfile, navInformation;
@@ -34,11 +44,11 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
 
-        // Khởi tạo DAO
+        // DAO
         itemDao = new ItemDao(this);
+        categoryDao = new CategoryDao(this);
 
-        // Ánh xạ view
-        recyclerFoodList = findViewById(R.id.recyclerFoodList);
+        // Views
         etSearch = findViewById(R.id.etSearch);
         imgBanner = findViewById(R.id.imgBanner);
 
@@ -48,47 +58,56 @@ public class HomeActivity extends AppCompatActivity {
         navProfile = findViewById(R.id.navProfile);
         navInformation = findViewById(R.id.navinformation);
 
-        // Load dữ liệu món ăn từ DB
-        itemList = itemDao.getAll();
-
-        // Setup RecyclerView
+        recyclerFoodList = findViewById(R.id.recyclerFoodList);
         recyclerFoodList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FoodAdapter(this, itemList);
-        recyclerFoodList.setAdapter(adapter);
+
+        recyclerCategory = findViewById(R.id.recyclerCategory);
+        recyclerCategory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        // Load món ăn trước (để adapter không null khi click category)
+        itemList = itemDao.getAll();
+        foodAdapter = new FoodAdapter(this, itemList);
+        recyclerFoodList.setAdapter(foodAdapter);
+
+        // Load category
+        categoryList = categoryDao.getAll();
+        categoryAdapter = new CategoryHomeAdapter(this, categoryList);
+        recyclerCategory.setAdapter(categoryAdapter);
+
+        // Category click listener
+        categoryAdapter.setOnCategoryClickListener(c -> {
+            int categoryId = c.getId(); // hoặc c.id
+            itemList = itemDao.getByCategory(categoryId);
+            foodAdapter.updateList(itemList);
+        });
 
         // Navigation
         setupBottomNav();
 
-        // Tìm kiếm
+        // Search
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
-            String keyword = etSearch.getText().toString().trim();
-            searchItem(keyword);
-            return true;
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchItem(etSearch.getText().toString().trim());
+            }
+            return false;
         });
     }
 
     private void searchItem(String keyword) {
-        if (keyword.isEmpty()) {
-            itemList = itemDao.getAll();
-        } else {
-            itemList = itemDao.searchByName(keyword);
-        }
-        adapter.updateList(itemList);
+        if (keyword.isEmpty()) itemList = itemDao.getAll();
+        else itemList = itemDao.searchByName(keyword);
+        foodAdapter.updateList(itemList);
     }
 
     private void setupBottomNav() {
         navHome.setOnClickListener(v ->
                 Toast.makeText(this, "You are already on Home", Toast.LENGTH_SHORT).show());
-
         navCart.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, CartActivity.class)));
-
         navOrder.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, OrderHistoryActivity.class)));
-
         navProfile.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
-
         navInformation.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, InformationActivity.class)));
     }
