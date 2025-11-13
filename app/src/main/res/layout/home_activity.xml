@@ -184,12 +184,12 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/navinformation"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:id="@+id/btnLogout"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/ic_infomation"
+            android:background="@drawable/ic_out_home_24"
             android:layout_marginLeft="8dp"/>
     </LinearLayout>
 </RelativeLayout>

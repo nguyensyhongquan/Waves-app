@@ -35,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     private CategoryDao categoryDao;
 
     private EditText etSearch;
-    private LinearLayout navHome, navCart, navOrder, navProfile, navInformation;
+    private LinearLayout navHome, navCart, navOrder, navProfile, navOut;
     private ImageView imgBanner;
     private int currentUserId;
 
@@ -57,7 +57,7 @@ public class HomeActivity extends AppCompatActivity {
         navCart = findViewById(R.id.navCart);
         navOrder = findViewById(R.id.navOrder);
         navProfile = findViewById(R.id.navProfile);
-        navInformation = findViewById(R.id.navinformation);
+        navOut = findViewById(R.id.btnLogout);
 
         recyclerFoodList = findViewById(R.id.recyclerFoodList);
         recyclerFoodList.setLayoutManager(new LinearLayoutManager(this));
@@ -109,7 +109,24 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, OrderHistoryActivity.class)));
         navProfile.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
-        navInformation.setOnClickListener(v ->
-                startActivity(new Intent(HomeActivity.this, InformationActivity.class)));
+        navOut.setOnClickListener(v -> {
+            // 🔹 Xóa userId trong SharedPreferences
+            getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                    .edit()
+                    .remove("userId")
+                    .apply();
+
+            // 🔹 Thông báo đăng xuất
+            Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+
+            // 🔹 Chuyển về trang đăng nhập
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+            // 🔹 Đóng activity hiện tại
+            finish();
+        });
+
     }
 }
