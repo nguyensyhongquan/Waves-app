@@ -38,12 +38,14 @@ public class HomeActivity extends AppCompatActivity {
     private EditText etSearch;
     private LinearLayout navHome, navCart, navOrder, navProfile, navInformation;
     private ImageView imgBanner;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
-
+        // Lấy userid từ Intent
+        currentUserId = getIntent().getIntExtra("userid", -1);
         // DAO
         itemDao = new ItemDao(this);
         categoryDao = new CategoryDao(this);

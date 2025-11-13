@@ -53,34 +53,33 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Sử dụng UserDao để kiểm tra tài khoản
         user account = userDao.authRequest(emailOrPhone, password);
 
         if (account == null) {
-            // Login thất bại
             Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Kiểm tra role null hoặc rỗng
         String role = account.getRole();
         if (role == null || role.isEmpty()) {
             Toast.makeText(this, "Tài khoản bị chặn!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Login thành công
+        // 🔹 Lưu userId vào SharedPreferences
+        getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                .edit()
+                .putInt("userId", account.getUserid())
+                .apply();
+
         Toast.makeText(this, "Xin chào " + account.getName() + " (" + role + ")", Toast.LENGTH_SHORT).show();
+
         if (role.equals("Admin")) {
-            Intent intent = new Intent(LoginActivity.this, AdminHomeActivity.class);
-            intent.putExtra("username", account.getName());
-            startActivity(intent);
-            finish();
+            startActivity(new Intent(LoginActivity.this, AdminHomeActivity.class));
         } else if (role.equals("User")) {
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            intent.putExtra("username", account.getName());
-            startActivity(intent);
-            finish();
+            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
         }
+        finish();
     }
+
 }

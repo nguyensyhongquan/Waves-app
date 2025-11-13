@@ -41,13 +41,17 @@
     <Button
         android:id="@+id/btnSelectImage"
         android:text="Select Image"
-        android:layout_width="match_parent"
+        android:backgroundTint="#6A99FF"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="120dp"
         android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/btnSaveItem"
         android:text="Save Item"
+        android:backgroundTint="#FF2409"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"/>
+
 </LinearLayout>

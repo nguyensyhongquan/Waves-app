@@ -54,6 +54,9 @@
         <activity
             android:name=".activity.CartActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:exported="false" />
 
     </application>
 

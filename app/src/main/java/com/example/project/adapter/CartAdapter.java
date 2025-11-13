@@ -1,6 +1,8 @@
 package com.example.project.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,11 +53,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvPrice.setText(String.format("$%.2f", item.getPrice()));
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
-        // Load ảnh bằng Picasso (bạn cần import Picasso lib)
         if (item.getImage() != null && !item.getImage().isEmpty()) {
-            Picasso.get().load(item.getImage())
-                    .placeholder(R.drawable.placeholder)
-                    .into(holder.imgItem);
+            try {
+                byte[] decoded = Base64.decode(item.getImage(), Base64.DEFAULT);
+                holder.imgItem.setImageBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
+            } catch (Exception e) {
+                holder.imgItem.setImageResource(R.drawable.ic_launcher_background);
+            }
+        } else {
+            holder.imgItem.setImageResource(R.drawable.ic_launcher_background);
         }
 
         // Nút tăng

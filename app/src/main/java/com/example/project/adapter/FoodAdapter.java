@@ -1,6 +1,8 @@
 package com.example.project.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,27 +54,15 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         holder.tvName.setText(currentItem.getName());
         holder.tvPrice.setText(String.format("$%.2f", currentItem.getPrice()));
 
-        // Ưu tiên load ảnh online qua URL (nếu có)
-        if (currentItem.getImage() != null && currentItem.getImage().startsWith("http")) {
-            Picasso.get()
-                    .load(currentItem.getImage())
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .into(holder.imgFood);
-        }
-        // Nếu chỉ có tên ảnh trong drawable
-        else if (currentItem.getImage() != null && !currentItem.getImage().isEmpty()) {
-            int resId = context.getResources().getIdentifier(
-                    currentItem.getImage(), "drawable", context.getPackageName());
-            if (resId != 0) {
-                holder.imgFood.setImageResource(resId);
-            } else {
-                holder.imgFood.setImageResource(R.drawable.placeholder);
+        if (currentItem.getImage() != null && !currentItem.getImage().isEmpty()) {
+            try {
+                byte[] decoded = Base64.decode(currentItem.getImage(), Base64.DEFAULT);
+                holder.imgFood.setImageBitmap(BitmapFactory.decodeByteArray(decoded, 0, decoded.length));
+            } catch (Exception e) {
+                holder.imgFood.setImageResource(R.drawable.ic_launcher_background);
             }
-        }
-        // Nếu không có ảnh
-        else {
-            holder.imgFood.setImageResource(R.drawable.placeholder);
+        } else {
+            holder.imgFood.setImageResource(R.drawable.ic_launcher_background);
         }
 
         // Sự kiện thêm vào giỏ hàng
